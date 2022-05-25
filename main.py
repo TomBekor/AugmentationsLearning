@@ -1,3 +1,6 @@
+import os
+import glob
+
 import numpy as np
 
 import torch
@@ -16,7 +19,7 @@ from PIL import Image
 
 from AugmentationsDataset import *
 
-from utils import plot_tensor, show_sample, kornia_rotation
+from utils import plot_tensor, show_sample, learning_grid
 
 
 
@@ -25,13 +28,25 @@ from utils import plot_tensor, show_sample, kornia_rotation
 target_rotation_deg = 90.
 
 # training
-init_rotation_deg = 60.
+init_rotation_deg = 50.
 batch_size = 64
 epochs = 1
 lr=0.1
 # momentum=0.9
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+# paths:
+run_name = f'init-{init_rotation_deg}_target-{target_rotation_deg}'
+
+figures_dir = f'figures'
+run_figures_dir = f'{figures_dir}/{run_name}'
+
+gifs_dir = f'gifs'
+run_gif_name = f'{gifs_dir}/{run_name}.gif'
+
+os.makedirs(run_figures_dir, exist_ok=True)
+os.makedirs(gifs_dir, exist_ok=True)
 ### -------------- ###
 
 
@@ -40,7 +55,7 @@ source_transform = transforms.Compose([
 ])
 
 target_augmentations = transforms.Compose([
-    K.augmentation.RandomAffine(degrees=[target_rotation_deg,target_rotation_deg], p=1), # nn.Module
+    K.augmentation.RandomRotation(degrees=[target_rotation_deg,target_rotation_deg], p=1), # nn.Module
 ])
 
 target_transform = transforms.Compose([
@@ -103,11 +118,24 @@ for epoch in range(epochs):
         if i % print_every == print_every - 1:
             print(f'[Epoch: {epoch+1} | Batch: {i+1} | MSE Loss: {running_loss/print_every:.3f} | {model.trans_param.item()}]')
             running_loss = 0.0
-        
-        if i == 300:
+
+            with torch.no_grad():
+                img_dict = {
+                    "source": dataset[0][0],
+                    "model's output": model(dataset[0][0]).squeeze(),
+                    "target": dataset[0][1]
+                }
+                learning_grid(img_dict, save=f'{run_figures_dir}/epoch-{epoch+1:02}_batch-{i+1:05}.png')
+                
+        if i == 1000:
             break
 
 print('Finished Training.')
 
-plt.plot(losses)
-plt.show()
+fp_in = f"{run_figures_dir}/epoch-*"
+fp_out = run_gif_name
+
+imgs = (Image.open(f) for f in sorted(glob.glob(fp_in)))
+img = next(imgs)  # extract first image from iterator
+img.save(fp=fp_out, format='GIF', append_images=imgs,
+         save_all=True, duration=75, loop=0)
