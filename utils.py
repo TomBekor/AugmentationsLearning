@@ -1,4 +1,4 @@
-import imp
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
@@ -66,3 +66,26 @@ def learning_grid(img_dict: dict, save=None):
         plt.close()
     else:
         plt.show()
+
+
+def create_loss_map(model_constructor, linspace, dataloader, loss_function, save):
+    loss_maps_path = 'loss_maps'
+    os.makedirs(loss_maps_path, exist_ok=True)
+    map_path = f'{loss_maps_path}/{save}.npy'
+    if not os.path.exists(map_path):
+        with torch.no_grad():
+            p_losses = []
+            for p in linspace:
+                p_model = model_constructor(init_rot_degree=p)
+                for i, data in enumerate(dataloader): # calc for one batch
+                    source_images, target_images = data
+                    source_images, target_images = source_images, target_images
+                    output_images = p_model(source_images)
+                    loss = loss_function(output_images, target_images)
+                    p_losses.append(loss.item())
+                    break
+        if save:
+            np.save(map_path, p_losses)
+    else:
+        p_losses = np.load(map_path)
+    return p_losses
