@@ -76,7 +76,7 @@ def create_loss_map(model_constructor, linspace, dataloader, loss_function, save
         with torch.no_grad():
             p_losses = []
             for p in linspace:
-                p_model = model_constructor(init_rot_degree=p)
+                p_model = model_constructor(init_param_val=p)
                 for i, data in enumerate(dataloader): # calc for one batch
                     source_images, target_images = data
                     source_images, target_images = source_images, target_images
