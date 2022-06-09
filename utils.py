@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 import torch
+from torch.nn.parameter import Parameter
 import torchvision
 import kornia as K
 
@@ -68,7 +69,7 @@ def learning_grid(img_dict: dict, save=None):
         plt.show()
 
 
-def create_loss_map(model_constructor, linspace, dataloader, loss_function, save):
+def old_create_loss_map(model_constructor, linspace, dataloader, loss_function, save):
     loss_maps_path = 'loss_maps'
     os.makedirs(loss_maps_path, exist_ok=True)
     map_path = f'{loss_maps_path}/{save}.npy'
@@ -77,6 +78,38 @@ def create_loss_map(model_constructor, linspace, dataloader, loss_function, save
             p_losses = []
             for p in linspace:
                 p_model = model_constructor(init_param_val=p)
+                for i, data in enumerate(dataloader): # calc for one batch
+                    source_images, target_images = data
+                    source_images, target_images = source_images, target_images
+                    output_images = p_model(source_images)
+                    loss = loss_function(output_images, target_images)
+                    p_losses.append(loss.item())
+                    break
+        if save:
+            np.save(map_path, p_losses)
+    else:
+        p_losses = np.load(map_path)
+    return p_losses
+
+
+def create_loss_map(model_constructor, training_aug_constructor, training_aug_constructor_args,
+                    aug_learnable_params, main_parameter_name, aug_bounds,
+                    linspace, dataloader, loss_function, save):
+    loss_maps_path = 'loss_maps'
+    os.makedirs(loss_maps_path, exist_ok=True)
+    map_path = f'{loss_maps_path}/{save}.npy'
+    if not os.path.exists(map_path):
+        with torch.no_grad():
+            p_losses = []
+            for p in linspace:
+                p_aug_learnable_params = aug_learnable_params.copy()
+                p_aug_learnable_params[main_parameter_name] = Parameter(torch.Tensor([p]))
+                p_model = model = model_constructor(
+                                    aug_constructor=training_aug_constructor,
+                                    learnable_params=p_aug_learnable_params,
+                                    aug_constructor_args=training_aug_constructor_args,
+                                    aug_bounds=aug_bounds
+                                )
                 for i, data in enumerate(dataloader): # calc for one batch
                     source_images, target_images = data
                     source_images, target_images = source_images, target_images

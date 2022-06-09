@@ -49,7 +49,7 @@ scheduler_constructor_args = {
 
 scheduler_warmup = 100
 scheduler_freq = 10
-use_scheduler=False
+use_scheduler=True
 
 early_stopping = 700
 

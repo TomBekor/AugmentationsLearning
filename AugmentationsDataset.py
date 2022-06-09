@@ -26,7 +26,7 @@ class AugmentationsDataset(Dataset):
             # print(image.mode)
             return self.__getitem__((idx + 1) % len(self))
         source_image = self.source_transform(image) # tensored image
-        target_image = self.target_transform(image).squeeze(0) # tensored image
+        target_image = self.target_transform(source_image.unsqueeze(0)).squeeze(0) # tensored image
         source_image.requires_grad_(True)
         target_image.requires_grad_(True)
 
