@@ -47,7 +47,7 @@ def show_sample(input, size: tuple = None):
 
 
 def learning_grid(img_dict: dict, save=None):
-    fig = plt.figure(figsize=(15,20))
+    fig = plt.figure(figsize=(15,10))
     grid = ImageGrid(fig, 111,  # similar to subplot(111)
                     nrows_ncols=(1, 3),  # creates 2x2 grid of axes
                     axes_pad=(2,10),  # pad between axes in inch.
@@ -56,7 +56,7 @@ def learning_grid(img_dict: dict, save=None):
     for ax, im_name in zip(grid, img_dict.keys()):
         # Iterating over the grid returns the Axes.
         ax.set_title(im_name, fontsize=20)
-        im = np.array(img_dict[im_name].permute(1,2,0).detach())
+        im = np.array(img_dict[im_name].permute(1,2,0).detach().cpu())
         ax.imshow(im)
 
         ax.get_xaxis().set_visible(False)

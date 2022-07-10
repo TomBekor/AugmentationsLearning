@@ -4,6 +4,8 @@ import torch
 from torch import nn, optim
 from torch.nn.parameter import Parameter
 import kornia as K
+from kAugmentations.kRotation import *
+
 
 
 ### --- Config --- ###
@@ -19,13 +21,8 @@ target_aug_constructor_args = {
     'angle': torch.Tensor([target_param_val])
 }
 
+kAugmentation = kRotation
 init_param_val = 0.0
-training_aug_constructor = K.geometry.transform.Rotate
-aug_learnable_params = {
-    'angle': Parameter(torch.Tensor([init_param_val]))
-}
-training_aug_constructor_args = {}
-aug_learnable_params_names = list(aug_learnable_params.keys())
 
 # training
 criterion_constructor = nn.MSELoss
@@ -51,7 +48,7 @@ scheduler_warmup = 100
 scheduler_freq = 10
 use_scheduler=True
 
-early_stopping = 700
+early_stopping = 500
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -68,3 +65,4 @@ run_gif_name = f'{gifs_dir}/{run_name}.gif'
 os.makedirs(run_figures_dir, exist_ok=True)
 os.makedirs(gifs_dir, exist_ok=True)
 os.makedirs(f'{run_figures_dir}/results', exist_ok=True)
+os.makedirs(f'{run_figures_dir}/learning_progress', exist_ok=True)

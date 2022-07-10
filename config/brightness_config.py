@@ -4,6 +4,7 @@ import torch
 from torch import nn, optim
 from torch.nn.parameter import Parameter
 import kornia as K
+from kAugmentations.kBrightness import *
 
 
 ### --- Config --- ###
@@ -19,13 +20,8 @@ target_aug_constructor_args = {
     'brightness_factor': target_param_val,
 }
 
-init_param_val = 0.0
-training_aug_constructor = K.enhance.AdjustBrightness
-aug_learnable_params = {
-    'brightness_factor': Parameter(torch.Tensor([init_param_val]))
-}
-training_aug_constructor_args = {}
-aug_learnable_params_names = list(aug_learnable_params.keys())
+kAugmentation = kBrightness
+init_param_val = 0.
 
 # training
 criterion_constructor = nn.MSELoss
@@ -68,3 +64,4 @@ run_gif_name = f'{gifs_dir}/{run_name}.gif'
 os.makedirs(run_figures_dir, exist_ok=True)
 os.makedirs(gifs_dir, exist_ok=True)
 os.makedirs(f'{run_figures_dir}/results', exist_ok=True)
+os.makedirs(f'{run_figures_dir}/learning_progress', exist_ok=True)

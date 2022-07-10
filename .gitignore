@@ -1,5 +1,5 @@
 __pycache__/
 .vscode
 drafts/
-figures/*/epoch-*
+figures/*/learning_progress/*
 loss_maps/

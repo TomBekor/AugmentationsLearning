@@ -4,25 +4,24 @@ import torch
 from torch import nn, optim
 from torch.nn.parameter import Parameter
 import kornia as K
-from kAugmentations.kShearX import *
-
+from kAugmentations.kContrast import *
 
 
 ### --- Config --- ###
-augmentation_name = 'shearX'
-main_parameter_name = 'shear'
-aug_bounds = (None, None)
-param_linspace = np.linspace(-2,2,400)
+augmentation_name = 'contrast'
+main_parameter_name = 'contrast_factor'
+aug_bounds = (0.0, None)
+param_linspace = np.linspace(0.0,20.,400)
 
 # dataset
-target_param_val = 0.4
-target_aug_constructor = K.geometry.transform.Shear
+target_param_val = 3.
+target_aug_constructor = K.enhance.AdjustContrast
 target_aug_constructor_args = {
-    'shear': torch.Tensor([[target_param_val, 0]]),
+    'contrast_factor': target_param_val,
 }
 
-kAugmentation = kShearX
-init_param_val = 0.0
+kAugmentation = kContrast
+init_param_val = 0.
 
 # training
 criterion_constructor = nn.MSELoss
@@ -33,21 +32,20 @@ epochs = 1
 
 optimizer_constructor = optim.SGD
 optimizer_constructor_args = {
-    'lr': 0.1,
+    'lr': 0.01,
     'momentum': 0.9,
 }
 
 scheduler_constructor = optim.lr_scheduler.CosineAnnealingLR
 scheduler_constructor_args = {
-    'T_max':200,
+    'T_max':100,
     'eta_min':0.1,
     'verbose':True,
 }
 
-use_scheduler=True
 scheduler_warmup = 100
 scheduler_freq = 10
-
+use_scheduler=False
 
 early_stopping = 500
 
