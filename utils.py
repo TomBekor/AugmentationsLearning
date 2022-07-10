@@ -46,7 +46,7 @@ def show_sample(input, size: tuple = None):
     plt.show()
 
 
-def learning_grid(img_dict: dict, save=None):
+def learning_grid(img_dict: dict, title, save=None):
     fig = plt.figure(figsize=(15,10))
     grid = ImageGrid(fig, 111,  # similar to subplot(111)
                     nrows_ncols=(1, 3),  # creates 2x2 grid of axes
@@ -61,6 +61,8 @@ def learning_grid(img_dict: dict, save=None):
 
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
+
+    fig.suptitle(title, fontsize=25)
     
     if save:
         plt.savefig(save)
