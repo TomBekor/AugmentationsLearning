@@ -8,3 +8,6 @@ Added: Multi-layered augmentations - currently working with translateX + contras
 ### Learning process gif:
 ![contrast-translateX](gifs/contrast-translateX_inits-(1.0,0.0)_targets-(3.0,20.0).gif)
 
+![](figures/contrast-translateX_inits-(1.0,0.0)_targets-(3.0,20.0)/results/parameter_progress__contrast.png)
+![](figures/contrast-translateX_inits-(1.0,0.0)_targets-(3.0,20.0)/results/parameter_progress__translateX.png)
+
