@@ -1,0 +1,54 @@
+rotation_config = SingleAugmentationConfig(
+    augmentation_name = 'rotation',
+    main_parameter_name = 'angle',
+    aug_bounds = (-360., 360.),
+    param_linspace = np.linspace(0., 360.,200),
+    target_param_val = 100.,
+    target_aug_constructor = K.geometry.transform.Rotate,
+    target_aug_constructor_args = {'angle': torch.Tensor([100.])},
+    kAugmentation = kRotation,
+    init_param_val = 60.,
+    optimizer_constructor = optim.SGD,
+    optimizer_constructor_args = {
+        'lr': 100,
+        'momentum': 0.99,
+    },
+    scheduler_constructor = optim.lr_scheduler.CosineAnnealingLR,
+    scheduler_constructor_args = {
+        'T_max':100,
+        'eta_min':10,
+        'verbose':True,
+    },
+    scheduler_warmup = 100,
+    scheduler_freq = 10,
+    use_scheduler=True,
+    early_stopping = 500,
+)
+
+
+brightness_config = SingleAugmentationConfig(
+    augmentation_name = 'brightness',
+    main_parameter_name = 'brightness_factor',
+    aug_bounds = (0.0, 1.0),
+    param_linspace = np.linspace(0., 1.,200),
+    target_param_val = .5,
+    target_aug_constructor = K.enhance.AdjustBrightness,
+    target_aug_constructor_args = {'brightness_factor': .5},
+    kAugmentation = kBrightness,
+    init_param_val = 0.0,
+    optimizer_constructor = optim.SGD,
+    optimizer_constructor_args = {
+        'lr': .01,
+        'momentum': 0.9,
+    },
+    use_scheduler=False,
+    scheduler_constructor = optim.lr_scheduler.CosineAnnealingLR,
+    scheduler_constructor_args = {
+        'T_max':100,
+        'eta_min':0.1,
+        'verbose':True,
+    },
+    scheduler_warmup = 100,
+    scheduler_freq = 10,
+    early_stopping = 500,
+)
